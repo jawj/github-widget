@@ -1,0 +1,46 @@
+.gw-repo-outer {
+  float: left;
+  width: 50%;
+}
+.gw-repo-outer:nth-child(2n + 1) {
+  clear: left;
+}
+.gw-repo {
+  padding: 0.5em 0;
+  margin: 0 1.5em 1em 0;
+  border-top: 1px solid #ccc;
+}
+.gw-repo:nth-child(2n) {
+  margin: 0 0 1em 1.5em;
+}
+.gw-title{
+  margin-bottom: 0.3em;
+}
+.gw-name {
+  font-weight: bold;
+}
+.gw-stats {
+  display: inline-block;
+  margin: 0;
+  float: right;
+}
+.gw-watchers, .gw-forks {
+  display: inline-block;
+  height: 21px;
+  padding: 0 5px 0 23px;
+  line-height: 21px;
+  background: transparent url('http://assets.github.com/images/modules/pagehead/repostat.png') no-repeat 0 0;
+}
+.gw-watchers {
+  background-position: 5px -2px;
+}
+.gw-forks {
+  background-position: 5px -52px;
+}
+.gw-lang {
+  font-size: 0.8em;
+  color: #777;
+}
+.gw-clearer {
+  clear: left;
+}
