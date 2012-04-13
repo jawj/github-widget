@@ -26,7 +26,9 @@
           _results2 = [];
           for (_i = 0, _len2 = _ref2.length; _i < _len2; _i++) {
             repo = _ref2[_i];
-            if (repo.fork || repo.name === siteRepoName) continue;
+            if (repo.fork || repo.name === siteRepoName || !(repo.description != null) || repo.description === '') {
+              continue;
+            }
             repoOuterTag = tag({
               className: 'gw-repo-outer',
               parent: div

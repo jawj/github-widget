@@ -16,7 +16,7 @@ go = ->
         tag className: 'gw-clearer', prevSibling: div
         siteRepoName = "#{user}.github.com"
         for repo in data.repositories.sort((a, b) -> b.watchers - a.watchers)
-          continue if repo.fork or repo.name is siteRepoName
+          continue if repo.fork or repo.name is siteRepoName or not repo.description? or repo.description is ''
           repoOuterTag = tag className: 'gw-repo-outer', parent: div
           repoTag = tag className: 'gw-repo', parent: repoOuterTag
           titleTag = tag className: 'gw-title', parent: repoTag
