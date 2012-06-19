@@ -1,9 +1,18 @@
+###
 
-# usage: <div class='github-widget' data-user='jawj'></div>
-#        <script src='github-widget.js'></script><link href='github-widget.css' rel='stylesheet' />
+usage: 
 
-# minify: java -jar ~/bin/closure-compiler.jar --compilation_level SIMPLE_OPTIMIZATIONS \
-#         --js github-widget.js --js_output_file github-widget.min.js
+  <div class='github-widget' data-user='jawj'></div>
+  <script src='github-widget.js'></script><link href='github-widget.css' rel='stylesheet' />
+
+minify: 
+
+  java -jar ~/bin/closure-compiler.jar \
+            --compilation_level SIMPLE_OPTIMIZATIONS \
+            --js github-widget.js \
+            --js_output_file github-widget.min.js
+            
+###
 
 go = ->
   head = document.getElementsByTagName('head')[0]
@@ -12,22 +21,22 @@ go = ->
     user = div.getAttribute 'data-user'
     callback = "githubWidgetJSONPCallback_#{i}"
     window[callback] = ((div, user) -> 
-      (data) ->
+      (payload) ->
         tag className: 'gw-clearer', prevSibling: div
         siteRepoName = "#{user}.github.com"
-        for repo in data.repositories.sort((a, b) -> b.watchers - a.watchers)
+        for repo in payload.data.sort((a, b) -> b.watchers - a.watchers)
           continue if repo.fork or repo.name is siteRepoName or not repo.description? or repo.description is ''
           repoOuterTag = tag className: 'gw-repo-outer', parent: div
           repoTag = tag className: 'gw-repo', parent: repoOuterTag
           titleTag = tag className: 'gw-title', parent: repoTag
           statsTag = tag name: 'ul', className: 'gw-stats', parent: titleTag
-          tag name: 'a', href: repo.url, text: repo.name, className: 'gw-name', parent: titleTag
+          tag name: 'a', href: repo.html_url, text: repo.name, className: 'gw-name', parent: titleTag
           tag name: 'li', text: "#{repo.watchers}", className: 'gw-watchers', parent: statsTag
           tag name: 'li', text: "#{repo.forks}", className: 'gw-forks', parent: statsTag
           tag className: 'gw-lang', text: repo.language, parent: repoTag
           tag text: repo.description, className: 'gw-repo-desc', parent: repoTag
     )(div, user)
-    url  = "http://github.com/api/v2/json/repos/show/#{user}?callback=#{callback}"
+    url = "https://api.github.com/users/#{user}/repos?callback=#{callback}"
     tag name: 'script', src: url, parent: head
 
 tag = (opts) ->
