@@ -7,7 +7,7 @@ usage:
 
 minify: 
 
-  java -jar ~/bin/closure-compiler.jar \
+  java -jar /usr/local/closure-compiler/compiler.jar \
             --compilation_level SIMPLE_OPTIMIZATIONS \
             --js github-widget.js \
             --js_output_file github-widget.min.js
