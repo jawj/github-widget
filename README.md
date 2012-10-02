@@ -27,7 +27,7 @@ Between the `<head>` tags in your HTML files or template, add:
 
 Then, at the page location where you want to show your GitHub repositories, paste in:
 
-    <div class="github-widget" data-user="your-github-username" style="margin-top: 24px;"></div>
+    <div class="github-widget" data-user="your-github-username"></div>
 
 Replace the value of the `data-user` attribute with your actual GitHub username.
 
