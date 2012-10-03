@@ -1,17 +1,12 @@
 ###
 
-usage: 
-
-  <div class='github-widget' data-user='jawj'></div>
-  <script src='github-widget.js'></script><link href='github-widget.css' rel='stylesheet' />
-
 minify: 
 
-  java -jar /usr/local/closure-compiler/compiler.jar \
-            --compilation_level SIMPLE_OPTIMIZATIONS \
-            --js github-widget.js \
-            --js_output_file github-widget.min.js
-            
+java -jar /usr/local/closure-compiler/compiler.jar \
+  --compilation_level SIMPLE_OPTIMIZATIONS \
+  --js github-widget.js \
+  --js_output_file github-widget.min.js
+  
 ###
 
 go = ->
