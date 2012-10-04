@@ -1,12 +1,9 @@
 ###
-
-minify: 
-
+# to minify: 
 java -jar /usr/local/closure-compiler/compiler.jar \
   --compilation_level SIMPLE_OPTIMIZATIONS \
   --js github-widget.js \
   --js_output_file github-widget.min.js
-  
 ###
 
 go = ->
@@ -28,7 +25,7 @@ go = ->
           tag name: 'a', href: repo.html_url, text: repo.name, className: 'gw-name', parent: titleTag
           tag name: 'li', text: "#{repo.watchers}", className: 'gw-watchers', parent: statsTag
           tag name: 'li', text: "#{repo.forks}", className: 'gw-forks', parent: statsTag
-          tag className: 'gw-lang', text: repo.language, parent: repoTag
+          tag className: 'gw-lang', text: repo.language, parent: repoTag if repo.language?
           tag text: repo.description, className: 'gw-repo-desc', parent: repoTag
     )(div, user)
     url = "https://api.github.com/users/#{user}/repos?callback=#{callback}"
