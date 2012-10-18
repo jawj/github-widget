@@ -9,7 +9,7 @@ What does it do?
 
 It lets you show an up-to-date list of a user's GitHub repositories on another webpage.
 
-It pulls the data from the GitHub JSPON-P API, builds some simple HTML from it, and styles this with CSS.
+It pulls the data from the GitHub JSON-P API, builds some simple HTML from it, and styles this with CSS.
 
 It ignores: forks; any GitHub home page repo (username.github.com); and any repo with no description. It sorts what's left by descending number of watchers (now stars).
 
