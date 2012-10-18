@@ -33,10 +33,8 @@ Set it up
 
 Between the `<head>` tags in your HTML files or template, add:
 
-
-    <link href='github-widget/github-widget.css' media='screen' rel='stylesheet' type='text/css' />
-    <script src='github-widget/github-widget.min.js'></script>
-
+    <link href="github-widget/github-widget.css" rel="stylesheet" type="text/css" />
+    <script src="github-widget/github-widget.min.js"></script>
 
 Then, at the page location where you want to show your GitHub repositories, paste in:
 
