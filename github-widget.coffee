@@ -6,8 +6,9 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   --js_output_file github-widget.min.js
 ###
 
-makeWidget = (div, user, payload) ->
+makeWidget = (payload, div) ->
   make className: 'gw-clearer', prevSib: div
+  user = div.getAttribute 'data-user'
   siteRepoName = "#{user}.github.com"
   for repo in payload.data.sort((a, b) -> b.watchers - a.watchers)
     continue if repo.fork or repo.name is siteRepoName or not repo.description? or repo.description is ''
@@ -23,10 +24,9 @@ makeWidget = (div, user, payload) ->
 
 init = ->
   for div in (get cls: 'github-widget')
-    do (div) ->  # close over correct div and user
-      user = div.getAttribute 'data-user'
-      url = "https://api.github.com/users/#{user}/repos?callback=<cb>"
-      jsonp url: url, success: (payload) -> makeWidget div, user, payload
+    do (div) ->  # close over correct div
+      url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
+      jsonp url: url, success: (payload) -> makeWidget payload, div
 
 # support functions
 

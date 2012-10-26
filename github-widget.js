@@ -14,12 +14,13 @@ java -jar /usr/local/closure-compiler/compiler.jar \
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __hasProp = {}.hasOwnProperty;
 
-  makeWidget = function(div, user, payload) {
-    var repo, repoOuterTag, repoTag, siteRepoName, statsTag, titleTag, _i, _len, _ref, _results;
+  makeWidget = function(payload, div) {
+    var repo, repoOuterTag, repoTag, siteRepoName, statsTag, titleTag, user, _i, _len, _ref, _results;
     make({
       className: 'gw-clearer',
       prevSib: div
     });
+    user = div.getAttribute('data-user');
     siteRepoName = "" + user + ".github.com";
     _ref = payload.data.sort(function(a, b) {
       return b.watchers - a.watchers;
@@ -91,13 +92,12 @@ java -jar /usr/local/closure-compiler/compiler.jar \
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       div = _ref[_i];
       _results.push((function(div) {
-        var url, user;
-        user = div.getAttribute('data-user');
-        url = "https://api.github.com/users/" + user + "/repos?callback=<cb>";
+        var url;
+        url = "https://api.github.com/users/" + (div.getAttribute('data-user')) + "/repos?callback=<cb>";
         return jsonp({
           url: url,
           success: function(payload) {
-            return makeWidget(div, user, payload);
+            return makeWidget(payload, div);
           }
         });
       })(div));
