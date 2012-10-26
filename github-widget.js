@@ -86,6 +86,7 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   init = function() {
     var div, _i, _len, _ref, _results;
     _ref = get({
+      tag: 'div',
       cls: 'github-widget'
     });
     _results = [];

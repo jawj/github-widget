@@ -23,7 +23,7 @@ makeWidget = (payload, div) ->
     make text: repo.description, className: 'gw-repo-desc', parent: repoTag
 
 init = ->
-  for div in (get cls: 'github-widget')
+  for div in (get tag: 'div', cls: 'github-widget')
     do (div) ->  # close over correct div
       url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
       jsonp url: url, success: (payload) -> makeWidget payload, div
