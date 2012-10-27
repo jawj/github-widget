@@ -15,7 +15,7 @@ It ignores: forks; any GitHub home page repo (username.github.com); and any repo
 
 It works back to IE6 (though some of the styling is ugly there, and it's not super-relevant, given that GitHub doesn't).
 
-It's less than 3KB, and has no dependencies.
+It's less than 4KB, and has no dependencies.
 
 
 How do I use it?

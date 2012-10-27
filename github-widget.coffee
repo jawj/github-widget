@@ -12,15 +12,15 @@ makeWidget = (payload, div) ->
   siteRepoName = "#{user}.github.com"
   for repo in payload.data.sort((a, b) -> b.watchers - a.watchers)
     continue if repo.fork or repo.name is siteRepoName or not repo.description? or repo.description is ''
-    repoOuterTag = make className: 'gw-repo-outer', parent: div
-    repoTag = make className: 'gw-repo', parent: repoOuterTag
-    titleTag = make className: 'gw-title', parent: repoTag
-    statsTag = make tag: 'ul', className: 'gw-stats', parent: titleTag
-    make tag: 'a', href: repo.html_url, text: repo.name, className: 'gw-name', parent: titleTag
-    make tag: 'li', text: repo.watchers, className: 'gw-watchers', parent: statsTag
-    make tag: 'li', text: repo.forks, className: 'gw-forks', parent: statsTag
-    make className: 'gw-lang', text: repo.language, parent: repoTag if repo.language?
-    make text: repo.description, className: 'gw-repo-desc', parent: repoTag
+    make parent: div, className: 'gw-repo-outer', kids: [
+      make className: 'gw-repo', kids: [
+        make className: 'gw-title', kids: [
+          make tag: 'ul', className: 'gw-stats', kids: [
+            make tag: 'li', text: repo.watchers, className: 'gw-watchers'
+            make tag: 'li', text: repo.forks, className: 'gw-forks']
+          make tag: 'a', href: repo.html_url, text: repo.name, className: 'gw-name']
+        make className: 'gw-lang', text: repo.language if repo.language?
+        make text: repo.description, className: 'gw-repo-desc']]
 
 init = ->
   for div in (get tag: 'div', cls: 'github-widget')
@@ -68,16 +68,23 @@ get = (opts = {}) ->
 
 get.uniqueTags = 'html body frameset head title base'.split(' ')
 
+text = (t) -> document.createTextNode '' + t
+
 make = (opts = {}) ->  # opts: tag, parent, prevSib, text, cls, [attrib]
   t = document.createElement opts.tag ? 'div'
   for own k, v of opts
     switch k
       when 'tag' then continue
       when 'parent' then v.appendChild t
+      when 'kids' then t.appendChild c for c in v when c?
       when 'prevSib' then v.parentNode.insertBefore t, v.nextSibling
-      when 'text' then t.appendChild document.createTextNode '' + v
+      when 'text' then t.appendChild text v
       when 'cls' then t.className = v
-      else t[k] = v
+      else 
+        if (k.substring 0, 2) is 'on'
+          if t.addEventListener? then t.addEventListener (k.substring 2), v, no
+          else t.attachEvent k, v
+        else t[k] = v
   t
 
 jsonp = (opts) ->

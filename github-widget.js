@@ -10,12 +10,12 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 
 
 (function() {
-  var cls, get, init, jsonp, make, makeWidget,
+  var cls, get, init, jsonp, make, makeWidget, text,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __hasProp = {}.hasOwnProperty;
 
   makeWidget = function(payload, div) {
-    var repo, repoOuterTag, repoTag, siteRepoName, statsTag, titleTag, user, _i, _len, _ref, _results;
+    var repo, siteRepoName, user, _i, _len, _ref, _results;
     make({
       className: 'gw-clearer',
       prevSib: div
@@ -31,53 +31,47 @@ java -jar /usr/local/closure-compiler/compiler.jar \
       if (repo.fork || repo.name === siteRepoName || !(repo.description != null) || repo.description === '') {
         continue;
       }
-      repoOuterTag = make({
-        className: 'gw-repo-outer',
-        parent: div
-      });
-      repoTag = make({
-        className: 'gw-repo',
-        parent: repoOuterTag
-      });
-      titleTag = make({
-        className: 'gw-title',
-        parent: repoTag
-      });
-      statsTag = make({
-        tag: 'ul',
-        className: 'gw-stats',
-        parent: titleTag
-      });
-      make({
-        tag: 'a',
-        href: repo.html_url,
-        text: repo.name,
-        className: 'gw-name',
-        parent: titleTag
-      });
-      make({
-        tag: 'li',
-        text: repo.watchers,
-        className: 'gw-watchers',
-        parent: statsTag
-      });
-      make({
-        tag: 'li',
-        text: repo.forks,
-        className: 'gw-forks',
-        parent: statsTag
-      });
-      if (repo.language != null) {
-        make({
-          className: 'gw-lang',
-          text: repo.language,
-          parent: repoTag
-        });
-      }
       _results.push(make({
-        text: repo.description,
-        className: 'gw-repo-desc',
-        parent: repoTag
+        parent: div,
+        className: 'gw-repo-outer',
+        kids: [
+          make({
+            className: 'gw-repo',
+            kids: [
+              make({
+                className: 'gw-title',
+                kids: [
+                  make({
+                    tag: 'ul',
+                    className: 'gw-stats',
+                    kids: [
+                      make({
+                        tag: 'li',
+                        text: repo.watchers,
+                        className: 'gw-watchers'
+                      }), make({
+                        tag: 'li',
+                        text: repo.forks,
+                        className: 'gw-forks'
+                      })
+                    ]
+                  }), make({
+                    tag: 'a',
+                    href: repo.html_url,
+                    text: repo.name,
+                    className: 'gw-name'
+                  })
+                ]
+              }), repo.language != null ? make({
+                className: 'gw-lang',
+                text: repo.language
+              }) : void 0, make({
+                text: repo.description,
+                className: 'gw-repo-desc'
+              })
+            ]
+          })
+        ]
       }));
     }
     return _results;
@@ -206,8 +200,12 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 
   get.uniqueTags = 'html body frameset head title base'.split(' ');
 
+  text = function(t) {
+    return document.createTextNode('' + t);
+  };
+
   make = function(opts) {
-    var k, t, v, _ref;
+    var c, k, t, v, _i, _len, _ref;
     if (opts == null) {
       opts = {};
     }
@@ -221,17 +219,33 @@ java -jar /usr/local/closure-compiler/compiler.jar \
         case 'parent':
           v.appendChild(t);
           break;
+        case 'kids':
+          for (_i = 0, _len = v.length; _i < _len; _i++) {
+            c = v[_i];
+            if (c != null) {
+              t.appendChild(c);
+            }
+          }
+          break;
         case 'prevSib':
           v.parentNode.insertBefore(t, v.nextSibling);
           break;
         case 'text':
-          t.appendChild(document.createTextNode('' + v));
+          t.appendChild(text(v));
           break;
         case 'cls':
           t.className = v;
           break;
         default:
-          t[k] = v;
+          if ((k.substring(0, 2)) === 'on') {
+            if (t.addEventListener != null) {
+              t.addEventListener(k.substring(2), v, false);
+            } else {
+              t.attachEvent(k, v);
+            }
+          } else {
+            t[k] = v;
+          }
       }
     }
     return t;
