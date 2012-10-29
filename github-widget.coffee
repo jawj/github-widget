@@ -6,21 +6,25 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   --js_output_file github-widget.min.js
 ###
 
+###* @preserve https://github.com/jawj/github-widget
+Copyright (c) 2011 - 2012 George MacKerron
+Released under the MIT licence: http://opensource.org/licenses/mit-license ###
+
 makeWidget = (payload, div) ->
-  make className: 'gw-clearer', prevSib: div
+  make cls: 'gw-clearer', prevSib: div
   user = div.getAttribute 'data-user'
   siteRepoName = "#{user}.github.com"
   for repo in payload.data.sort((a, b) -> b.watchers - a.watchers)
-    continue if repo.fork or repo.name is siteRepoName or not repo.description? or repo.description is ''
-    make parent: div, className: 'gw-repo-outer', kids: [
-      make className: 'gw-repo', kids: [
-        make className: 'gw-title', kids: [
-          make tag: 'ul', className: 'gw-stats', kids: [
-            make tag: 'li', text: repo.watchers, className: 'gw-watchers'
-            make tag: 'li', text: repo.forks, className: 'gw-forks']
-          make tag: 'a', href: repo.html_url, text: repo.name, className: 'gw-name']
-        make className: 'gw-lang', text: repo.language if repo.language?
-        make text: repo.description, className: 'gw-repo-desc']]
+    continue if repo.fork or repo.name is siteRepoName or not repo.description
+    make parent: div, cls: 'gw-repo-outer', kids: [
+      make cls: 'gw-repo', kids: [
+        make cls: 'gw-title', kids: [
+          make tag: 'ul', cls: 'gw-stats', kids: [
+            make tag: 'li', text: repo.watchers, cls: 'gw-watchers'
+            make tag: 'li', text: repo.forks, cls: 'gw-forks']
+          make tag: 'a', href: repo.html_url, text: repo.name, cls: 'gw-name']
+        make cls: 'gw-lang', text: repo.language if repo.language?
+        make cls: 'gw-repo-desc', text: repo.description]]
 
 init = ->
   for div in (get tag: 'div', cls: 'github-widget')
@@ -28,9 +32,10 @@ init = ->
       url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
       jsonp url: url, success: (payload) -> makeWidget payload, div
 
+
 # support functions
 
-cls = (el, opts = {}) ->
+cls = (el, opts = {}) ->  # cut-down version: no manipulation support
   classHash = {}  
   classes = el.className.match(cls.re)
   if classes?
@@ -39,17 +44,6 @@ cls = (el, opts = {}) ->
   if hasClasses?
     (return no unless classHash[c]) for c in hasClasses
     return yes
-  addClasses = opts.add?.match(cls.re)
-  if addClasses?
-    (classHash[c] = yes) for c in addClasses
-  removeClasses = opts.remove?.match(cls.re)
-  if removeClasses?
-    delete classHash[c] for c in removeClasses
-  toggleClasses = opts.toggle?.match(cls.re)
-  if toggleClasses?
-    for c in toggleClasses
-      if classHash[c] then delete classHash[c] else classHash[c] = yes
-  el.className = (k for k of classHash).join ' '
   null
 
 cls.re = /\S+/g
@@ -80,11 +74,7 @@ make = (opts = {}) ->  # opts: tag, parent, prevSib, text, cls, [attrib]
       when 'prevSib' then v.parentNode.insertBefore t, v.nextSibling
       when 'text' then t.appendChild text v
       when 'cls' then t.className = v
-      else 
-        if (k.substring 0, 2) is 'on'
-          if t.addEventListener? then t.addEventListener (k.substring 2), v, no
-          else t.attachEvent k, v
-        else t[k] = v
+      else t[k] = v
   t
 
 jsonp = (opts) ->

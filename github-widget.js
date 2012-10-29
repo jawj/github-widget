@@ -9,6 +9,12 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 */
 
 
+/** @preserve https://github.com/jawj/github-widget
+Copyright (c) 2011 - 2012 George MacKerron
+Released under the MIT licence: http://opensource.org/licenses/mit-license
+*/
+
+
 (function() {
   var cls, get, init, jsonp, make, makeWidget, text,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
@@ -17,7 +23,7 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   makeWidget = function(payload, div) {
     var repo, siteRepoName, user, _i, _len, _ref, _results;
     make({
-      className: 'gw-clearer',
+      cls: 'gw-clearer',
       prevSib: div
     });
     user = div.getAttribute('data-user');
@@ -28,46 +34,46 @@ java -jar /usr/local/closure-compiler/compiler.jar \
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       repo = _ref[_i];
-      if (repo.fork || repo.name === siteRepoName || !(repo.description != null) || repo.description === '') {
+      if (repo.fork || repo.name === siteRepoName || !repo.description) {
         continue;
       }
       _results.push(make({
         parent: div,
-        className: 'gw-repo-outer',
+        cls: 'gw-repo-outer',
         kids: [
           make({
-            className: 'gw-repo',
+            cls: 'gw-repo',
             kids: [
               make({
-                className: 'gw-title',
+                cls: 'gw-title',
                 kids: [
                   make({
                     tag: 'ul',
-                    className: 'gw-stats',
+                    cls: 'gw-stats',
                     kids: [
                       make({
                         tag: 'li',
                         text: repo.watchers,
-                        className: 'gw-watchers'
+                        cls: 'gw-watchers'
                       }), make({
                         tag: 'li',
                         text: repo.forks,
-                        className: 'gw-forks'
+                        cls: 'gw-forks'
                       })
                     ]
                   }), make({
                     tag: 'a',
                     href: repo.html_url,
                     text: repo.name,
-                    className: 'gw-name'
+                    cls: 'gw-name'
                   })
                 ]
               }), repo.language != null ? make({
-                className: 'gw-lang',
+                cls: 'gw-lang',
                 text: repo.language
               }) : void 0, make({
-                text: repo.description,
-                className: 'gw-repo-desc'
+                cls: 'gw-repo-desc',
+                text: repo.description
               })
             ]
           })
@@ -101,7 +107,7 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   };
 
   cls = function(el, opts) {
-    var addClasses, c, classHash, classes, hasClasses, k, removeClasses, toggleClasses, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3;
+    var c, classHash, classes, hasClasses, _i, _j, _len, _len1, _ref;
     if (opts == null) {
       opts = {};
     }
@@ -123,39 +129,6 @@ java -jar /usr/local/closure-compiler/compiler.jar \
       }
       return true;
     }
-    addClasses = (_ref1 = opts.add) != null ? _ref1.match(cls.re) : void 0;
-    if (addClasses != null) {
-      for (_k = 0, _len2 = addClasses.length; _k < _len2; _k++) {
-        c = addClasses[_k];
-        classHash[c] = true;
-      }
-    }
-    removeClasses = (_ref2 = opts.remove) != null ? _ref2.match(cls.re) : void 0;
-    if (removeClasses != null) {
-      for (_l = 0, _len3 = removeClasses.length; _l < _len3; _l++) {
-        c = removeClasses[_l];
-        delete classHash[c];
-      }
-    }
-    toggleClasses = (_ref3 = opts.toggle) != null ? _ref3.match(cls.re) : void 0;
-    if (toggleClasses != null) {
-      for (_m = 0, _len4 = toggleClasses.length; _m < _len4; _m++) {
-        c = toggleClasses[_m];
-        if (classHash[c]) {
-          delete classHash[c];
-        } else {
-          classHash[c] = true;
-        }
-      }
-    }
-    el.className = ((function() {
-      var _results;
-      _results = [];
-      for (k in classHash) {
-        _results.push(k);
-      }
-      return _results;
-    })()).join(' ');
     return null;
   };
 
@@ -237,15 +210,7 @@ java -jar /usr/local/closure-compiler/compiler.jar \
           t.className = v;
           break;
         default:
-          if ((k.substring(0, 2)) === 'on') {
-            if (t.addEventListener != null) {
-              t.addEventListener(k.substring(2), v, false);
-            } else {
-              t.attachEvent(k, v);
-            }
-          } else {
-            t[k] = v;
-          }
+          t[k] = v;
       }
     }
     return t;
