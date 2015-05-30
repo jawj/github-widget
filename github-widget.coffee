@@ -1,5 +1,5 @@
 ###
-# to minify: 
+# to minify:
 java -jar /usr/local/closure-compiler/compiler.jar \
   --compilation_level SIMPLE_OPTIMIZATIONS \
   --js github-widget.js \
@@ -13,9 +13,15 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license ###
 makeWidget = (payload, div) ->
   make cls: 'gw-clearer', prevSib: div
   user = div.getAttribute 'data-user'
+  opts = div.getAttribute 'data-options'
+  opts = if typeof opts is 'string' then JSON.parse(opts) else {}
   siteRepoName = "#{user}.github.com"
-  for repo in payload.data.sort((a, b) -> b.watchers - a.watchers)
-    continue if repo.fork or repo.name is siteRepoName or not repo.description
+  sortBy = opts.sortBy or 'watchers'
+  limit = parseInt(opts.limit) or Infinity
+  made = 0
+  for repo in payload.data.sort((a, b) -> b[sortBy] - a[sortBy])
+    continue if (not opts.forks and repo.fork) or repo.name is siteRepoName or not repo.description
+    break if made++ is limit
     make parent: div, cls: 'gw-repo-outer', kids: [
       make cls: 'gw-repo', kids: [
         make cls: 'gw-title', kids: [
@@ -36,7 +42,7 @@ init = ->
 # support functions
 
 cls = (el, opts = {}) ->  # cut-down version: no manipulation support
-  classHash = {}  
+  classHash = {}
   classes = el.className.match(cls.re)
   if classes?
     (classHash[c] = yes) for c in classes
@@ -48,7 +54,7 @@ cls = (el, opts = {}) ->  # cut-down version: no manipulation support
 
 cls.re = /\S+/g
 
-get = (opts = {}) ->  
+get = (opts = {}) ->
   inside = opts.inside ? document
   tag = opts.tag ? '*'
   if opts.id?
