@@ -15,12 +15,12 @@ makeWidget = (payload, div) ->
   user = div.getAttribute 'data-user'
   opts = div.getAttribute 'data-options'
   opts = if typeof opts is 'string' then JSON.parse(opts) else {}
-  siteRepoName = "#{user}.github.com"
+  siteRepoNames = ["#{user}.github.com".toLowerCase(), "#{user}.github.io".toLowerCase()]
   sortBy = opts.sortBy or 'watchers'
   limit = parseInt(opts.limit) or Infinity
   made = 0
   for repo in payload.data.sort((a, b) -> b[sortBy] - a[sortBy])
-    continue if (not opts.forks and repo.fork) or repo.name is siteRepoName or not repo.description
+    continue if (not opts.forks and repo.fork) or repo.name.toLowerCase() in siteRepoNames or not repo.description
     break if made++ is limit
     make parent: div, cls: 'gw-repo-outer', kids: [
       make cls: 'gw-repo', kids: [
