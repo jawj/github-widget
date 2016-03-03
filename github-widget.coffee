@@ -10,9 +10,8 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 Copyright (c) 2011 - 2012 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license ###
 
-makeWidget = (payload, div) ->
+makeWidget = (user, payload, div) ->
   make cls: 'gw-clearer', prevSib: div
-  user = div.getAttribute 'data-user'
   opts = div.getAttribute 'data-options'
   opts = if typeof opts is 'string' then JSON.parse(opts) else {}
   siteRepoNames = ["#{user}.github.com".toLowerCase(), "#{user}.github.io".toLowerCase()]
@@ -35,8 +34,11 @@ makeWidget = (payload, div) ->
 init = ->
   for div in (get tag: 'div', cls: 'github-widget')
     do (div) ->  # close over correct div
-      url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
-      jsonp url: url, success: (payload) -> makeWidget payload, div
+      users = (div.getAttribute 'data-user').split ','
+      for user in users
+        url = "https://api.github.com/users/#{user}/repos?callback=<cb>"
+        jsonp url: url, success: (payload) -> makeWidget user, payload, div
+
 
 
 # support functions
