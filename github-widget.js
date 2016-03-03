@@ -19,13 +19,12 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     hasProp = {}.hasOwnProperty;
 
-  makeWidget = function(payload, div) {
-    var i, len, limit, made, opts, ref, ref1, repo, results, siteRepoNames, sortBy, user;
+  makeWidget = function(user, payload, div) {
+    var i, len, limit, made, opts, ref, ref1, repo, results, siteRepoNames, sortBy;
     make({
       cls: 'gw-clearer',
       prevSib: div
     });
-    user = div.getAttribute('data-user');
     opts = div.getAttribute('data-options');
     opts = typeof opts === 'string' ? JSON.parse(opts) : {};
     siteRepoNames = [(user + ".github.com").toLowerCase(), (user + ".github.io").toLowerCase()];
@@ -100,14 +99,20 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
     for (i = 0, len = ref.length; i < len; i++) {
       div = ref[i];
       results.push((function(div) {
-        var url;
-        url = "https://api.github.com/users/" + (div.getAttribute('data-user')) + "/repos?callback=<cb>";
-        return jsonp({
-          url: url,
-          success: function(payload) {
-            return makeWidget(payload, div);
-          }
-        });
+        var j, len1, results1, url, user, users;
+        users = (div.getAttribute('data-user')).split(',');
+        results1 = [];
+        for (j = 0, len1 = users.length; j < len1; j++) {
+          user = users[j];
+          url = "https://api.github.com/users/" + user + "/repos?callback=<cb>";
+          results1.push(jsonp({
+            url: url,
+            success: function(payload) {
+              return makeWidget(user, payload, div);
+            }
+          }));
+        }
+        return results1;
       })(div));
     }
     return results;
