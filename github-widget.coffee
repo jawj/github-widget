@@ -9,19 +9,9 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 ###* @preserve https://github.com/jawj/github-widget
 Copyright (c) 2011 - 2012 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license ###
-
-makeWidget = (payload, div) ->
+makeWidget = (repos, div) ->
   make cls: 'gw-clearer', prevSib: div
-  user = div.getAttribute 'data-user'
-  opts = div.getAttribute 'data-options'
-  opts = if typeof opts is 'string' then JSON.parse(opts) else {}
-  siteRepoNames = ["#{user}.github.com".toLowerCase(), "#{user}.github.io".toLowerCase()]
-  sortBy = opts.sortBy or 'watchers'
-  limit = parseInt(opts.limit) or Infinity
-  made = 0
-  for repo in payload.data.sort((a, b) -> b[sortBy] - a[sortBy])
-    continue if (not opts.forks and repo.fork) or repo.name.toLowerCase() in siteRepoNames or not repo.description
-    break if made++ is limit
+  for repo in repos
     make parent: div, cls: 'gw-repo-outer', kids: [
       make cls: 'gw-repo', kids: [
         make cls: 'gw-title', kids: [
@@ -35,8 +25,28 @@ makeWidget = (payload, div) ->
 init = ->
   for div in (get tag: 'div', cls: 'github-widget')
     do (div) ->  # close over correct div
-      url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
-      jsonp url: url, success: (payload) -> makeWidget payload, div
+      users = (div.getAttribute 'data-user').split ','
+      opts = div.getAttribute 'data-options'
+      opts = if typeof opts is 'string' then JSON.parse(opts) else {}
+      sortBy = opts.sortBy or 'watchers'
+      limit = parseInt(opts.limit) or Infinity
+      repos = []
+      userCount = 0
+      for user in users
+        url = "https://api.github.com/users/#{user}/repos?callback=<cb>"
+        jsonp url: url, success: (payload) ->
+          if payload.data.length > 0
+            first_repo = payload.data[0]
+            userName = first_repo.owner.login
+            siteRepoNames = ["#{userName}.github.com".toLowerCase(), "#{userName}.github.io".toLowerCase()]
+            for repo in payload.data
+              continue if (not opts.forks and repo.fork) or repo.name.toLowerCase() in siteRepoNames or not repo.description
+              repos.push repo
+            userCount++
+            if userCount is users.length
+              repos = repos.sort((a, b) -> b[sortBy] - a[sortBy])
+              repos = repos[0..limit - 1]
+              makeWidget repos, div
 
 
 # support functions
