@@ -10,16 +10,16 @@ java -jar /usr/local/closure-compiler/compiler.jar \
 Copyright (c) 2011 - 2012 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license ###
 
-makeWidget = (payload, div) ->
+makeWidget = (payloadData, div) ->
   make cls: 'gw-clearer', prevSib: div
   user = div.getAttribute 'data-user'
   opts = div.getAttribute 'data-options'
   opts = if typeof opts is 'string' then JSON.parse(opts) else {}
   siteRepoNames = ["#{user}.github.com".toLowerCase(), "#{user}.github.io".toLowerCase()]
   sortBy = opts.sortBy or 'watchers'
-  limit = parseInt(opts.limit) or Infinity
+  limit = parseInt(opts.limit) or Infinity  # note: we always retrieve all pages of results
   made = 0
-  for repo in payload.data.sort((a, b) -> b[sortBy] - a[sortBy])
+  for repo in payloadData.sort((a, b) -> b[sortBy] - a[sortBy])
     continue if (not opts.forks and repo.fork) or repo.name.toLowerCase() in siteRepoNames or not repo.description
     break if made++ is limit
     make parent: div, cls: 'gw-repo-outer', kids: [
@@ -32,12 +32,25 @@ makeWidget = (payload, div) ->
         make cls: 'gw-lang', text: repo.language if repo.language?
         make cls: 'gw-repo-desc', text: repo.description]]
 
-init = ->
-  for div in (get tag: 'div', cls: 'github-widget')
-    do (div) ->  # close over correct div
-      url = "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>"
-      jsonp url: url, success: (payload) -> makeWidget payload, div
+allPayloadData = []
 
+init = ->
+  for div, i in (get tag: 'div', cls: 'github-widget')
+    do (div, i) ->  # close over correct div and index
+      allPayloadData.push []
+      # note: callback function will be same for all of user's pages
+      getNext "https://api.github.com/users/#{div.getAttribute 'data-user'}/repos?callback=<cb>", div, i
+
+getNext = (url, div, seq) ->
+  jsonp url: url, success: (payload) -> 
+    allPayloadData[seq] = allPayloadData[seq].concat payload.data
+    links = payload.meta.Link
+    if links
+      for link in links
+        if link[1].rel is 'next'
+          getNext link[0], div, seq
+          return
+    makeWidget allPayloadData[seq], div
 
 # support functions
 
